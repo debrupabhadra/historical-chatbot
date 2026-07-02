@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Historical Figure Chatbot</title>
+
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="container">
+
+<label for="character"><b>Choose a Historical Figure:</b></label>
+
+<select id="character">
+  <option value="Mahatma Gandhi">Mahatma Gandhi</option>
+  <option value="Albert Einstein">Albert Einstein</option>
+  <option value="Subhas Chandra Bose">Subhas Chandra Bose</option>
+  <option value="Rani Lakshmibai">Rani Lakshmibai</option>
+  <option value="Abraham Lincoln">Abraham Lincoln</option>
+  <option value="Marie Curie">Marie Curie</option>
+</select><br>
+<div class="header">
+
+    <img src="images/gandhi.jpg" id="portrait" class="header-avatar">
+
+    <div>
+
+        <h2 id="characterName">Mahatma Gandhi</h2>
+
+        <span class="online">● Online</span>
+
+    </div>
+
+</div>
+<div id="chat"></div>
+
+<div class="input-area">
+
+<input
+id="message"
+placeholder="Ask your chosen historical figure anything..."
+autocomplete="off"
+/>
+
+<button onclick="sendMessage()">➤</button>
+
+
+</div>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+
+</html>
