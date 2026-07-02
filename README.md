@@ -1,6 +1,6 @@
 # historical-chatbot
 # Historical Figure Chatbot
-
+Updated GitHub Pages deployment.
 An AI-powered chatbot that lets students have conversations with famous historical figures.
 
 ## Features
