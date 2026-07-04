@@ -1,108 +1,239 @@
 const chat = document.getElementById("chat");
-const character = document.getElementById("character").value;
+const input = document.getElementById("message");
+const characterSelect = document.getElementById("character");
+
 const portraits = {
-  "Mahatma Gandhi": "images/gandhi.jpg",
-  "Albert Einstein": "images/einstein.jpg",
-  "Subhas Chandra Bose": "images/netaji.jpg",
-  "Rani Lakshmibai": "images/lakshmibai.jpg",
-  "Abraham Lincoln": "images/lincoln.jpg",
-  "Marie Curie": "images/curie.jpg"
+    "Mahatma Gandhi": "images/gandhi.jpg",
+    "Albert Einstein": "images/einstein.jpg",
+    "Subhas Chandra Bose": "images/netaji.jpg",
+    "Rani Lakshmibai": "images/lakshmibai.jpg",
+    "Abraham Lincoln": "images/lincoln.jpg",
+    "Marie Curie": "images/curie.jpg"
 };
-let avatar = "images/gandhi.jpg"; // Default avatar
-document.getElementById("character").addEventListener("change", function () {
-  document.getElementById("portrait").src = portraits[this.value];
-  avatar = portraits[this.value]; // Update avatar based on selected character
-  document.getElementById("characterName").textContent = this.value; // Update character name
+
+let avatar = portraits["Mahatma Gandhi"];
+
+// ---------------------
+// Change character
+// ---------------------
+
+characterSelect.addEventListener("change", function () {
+
+    avatar = portraits[this.value];
+
+    document.getElementById("portrait").src = avatar;
+
+    document.getElementById("characterName").textContent = this.value;
+
 });
+
+// ---------------------
+// Auto Scroll
+// ---------------------
+
+function scrollToBottom() {
+
+    chat.scrollTo({
+        top: chat.scrollHeight,
+        behavior: "smooth"
+    });
+
+}
+// ---------------------
+// Text to Speech
+// ---------------------
+
+function speak(text) {
+
+    speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+
+    utterance.lang = "en-US";
+
+    utterance.rate = 1;
+
+    utterance.pitch = 1;
+
+    speechSynthesis.speak(utterance);
+
+}
+
+// ---------------------
+// Send Message
+// ---------------------
 
 async function sendMessage() {
-    const character = document.getElementById("character").value;
 
-  const input = document.getElementById("message");
-  const message = input.value.trim();
+    const message = input.value.trim();
 
-  if (message === "") return;
+    if (message === "") return;
 
-  chat.innerHTML += `
-<div class="user-row">
+    const character = characterSelect.value;
 
-    <div class="message user">
-        ${message}
+    // User message
+
+    chat.innerHTML += `
+    <div class="user-row">
+        <div class="message user">
+            ${message}
+        </div>
     </div>
+    `;
 
-</div>`;  
-  input.value = "";
+    input.value = "";
+    speak(data.reply);
 
-  try {
-console.log("Sending message:", message, "to character:", character);
-    const response = await fetch("https://historical-chatbot.debrupabhadra.workers.dev", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-     body: JSON.stringify({
-        message: message,
-    character: character
-    })
-    });
+    scrollToBottom();
+
+    // Typing indicator
+
     const typing = document.createElement("div");
-typing.className = "typing";
-typing.id = "typing";
 
+    typing.className = "chat-row";
 
-chat.appendChild(typing);
-chat.scrollTop = chat.scrollHeight;
-    const data = await response.json();
+    typing.id = "typing";
 
-    if (data.reply) {
-      chat.innerHTML += `<div class="bot"><div class="avatar-container"><img src="${avatar}" class="avatar"></div><b>${character}:</b> ${data.reply}</div>`;
-    } else {
-      chat.innerHTML += `<div class="bot"><b>Error:</b> ${JSON.stringify(data)}</div>`;
+    typing.innerHTML = `
+        <img src="${avatar}" class="avatar">
+
+        <div class="message bot">
+            <div class="name">${character}</div>
+            Typing...
+        </div>
+    `;
+
+    chat.appendChild(typing);
+
+    scrollToBottom();
+
+    try {
+
+        const response = await fetch(
+            "https://historical-chatbot.debrupabhadra.workers.dev",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    message,
+                    character
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        document.getElementById("typing").remove();
+
+        chat.innerHTML += `
+        <div class="chat-row">
+
+            <img src="${avatar}" class="avatar">
+
+            <div class="message bot">
+
+                <div class="name">${character}</div>
+
+                ${data.reply.replace(/\n/g,"<br>")}
+
+            </div>
+
+        </div>
+        `;
+
+    } catch (error) {
+
+        if(document.getElementById("typing"))
+            document.getElementById("typing").remove();
+
+        chat.innerHTML += `
+        <div class="chat-row">
+
+            <img src="${avatar}" class="avatar">
+
+            <div class="message bot">
+
+                <b>Error:</b> ${error.message}
+
+            </div>
+
+        </div>
+        `;
     }
 
-  } catch (error) {
-    chat.innerHTML += `<div class="bot"><b>Error:</b> ${error.message}</div>`;
-  }
+    scrollToBottom();
 
-  chat.scrollTop = chat.scrollHeight;
 }
-const input = document.getElementById("message");
 
-input.addEventListener("keydown", function(event) {
-    if (event.key === "Enter") {
-        event.preventDefault(); // Prevents form submission or newline
+// ---------------------
+// Enter key
+// ---------------------
+
+input.addEventListener("keydown", function(e){
+
+    if(e.key==="Enter"){
+
+        e.preventDefault();
+
         sendMessage();
+
     }
+
 });
+
+// ---------------------
+// Speech Recognition
+// ---------------------
+
 const micButton = document.getElementById("micButton");
-const messageInput = document.getElementById("message");
 
 const SpeechRecognition =
-    window.SpeechRecognition || window.webkitSpeechRecognition;
+window.SpeechRecognition || window.webkitSpeechRecognition;
 
-if (SpeechRecognition) {
+if(SpeechRecognition){
 
     const recognition = new SpeechRecognition();
 
-    recognition.lang = "en-US";
-    recognition.interimResults = false;
-    recognition.continuous = false;
+    recognition.lang="en-US";
 
-    micButton.addEventListener("click", () => {
+    recognition.interimResults=false;
+
+    recognition.continuous=false;
+
+    micButton.addEventListener("click",()=>{
+
         recognition.start();
-        micButton.innerHTML = "🎙️";
+
+        micButton.textContent="🎙️";
+
     });
 
-    recognition.onresult = (event) => {
-        messageInput.value = event.results[0][0].transcript;
-        micButton.innerHTML = "🎤";
+    recognition.onresult=function(event){
+
+        input.value=event.results[0][0].transcript;
+
     };
 
-    recognition.onend = () => {
-        micButton.innerHTML = "🎤";
+    recognition.onend=function(){
+
+        micButton.textContent="🎤";
+
     };
 
-} else {
-    micButton.disabled = true;
-    micButton.innerHTML = "❌";
+    recognition.onerror=function(event){
+
+        micButton.textContent="🎤";
+
+        alert("Microphone Error: "+event.error);
+
+    };
+
+}else{
+
+    micButton.style.display="none";
+
 }
