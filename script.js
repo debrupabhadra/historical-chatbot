@@ -74,16 +74,35 @@ input.addEventListener("keydown", function(event) {
         sendMessage();
     }
 });
-chat.innerHTML += `
-<div class="chat-row">
+const micButton = document.getElementById("micButton");
+const messageInput = document.getElementById("message");
 
-    <img src="${avatars[character]}"
-         class="avatar"
-         alt="${character}">
+const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
 
-    <div class="message bot">
-        <div class="name">${character}</div>
-        ${data.reply.replace(/\n/g,"<br>")}
-    </div>
+if (SpeechRecognition) {
 
-</div>`;
+    const recognition = new SpeechRecognition();
+
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+    recognition.continuous = false;
+
+    micButton.addEventListener("click", () => {
+        recognition.start();
+        micButton.innerHTML = "🎙️";
+    });
+
+    recognition.onresult = (event) => {
+        messageInput.value = event.results[0][0].transcript;
+        micButton.innerHTML = "🎤";
+    };
+
+    recognition.onend = () => {
+        micButton.innerHTML = "🎤";
+    };
+
+} else {
+    micButton.disabled = true;
+    micButton.innerHTML = "❌";
+}
