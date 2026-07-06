@@ -22,4 +22,4 @@ An AI-powered chatbot that lets students have conversations with famous historic
 
 ## Author
 
-Debrupa Bhadra
+Debrupa Sarkar
