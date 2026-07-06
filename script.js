@@ -39,25 +39,6 @@ function scrollToBottom() {
     });
 
 }
-// ---------------------
-// Text to Speech
-// ---------------------
-
-function speak(text) {
-
-    speechSynthesis.cancel();
-
-    const utterance = new SpeechSynthesisUtterance(text);
-
-    utterance.lang = "en-US";
-
-    utterance.rate = 1;
-
-    utterance.pitch = 1;
-
-    speechSynthesis.speak(utterance);
-
-}
 
 // ---------------------
 // Send Message
@@ -82,7 +63,7 @@ async function sendMessage() {
     `;
 
     input.value = "";
-    speak(data.reply);
+    
 
     scrollToBottom();
 
